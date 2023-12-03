@@ -1,5 +1,4 @@
 import os
-
 import logging
 from logging.handlers import RotatingFileHandler
 
@@ -7,7 +6,7 @@ import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 
-from telegram import send_message_telegram
+# from telegram import send_message_telegram
 
 
 load_dotenv()
@@ -50,7 +49,7 @@ async def info_command(ctx):
     """Бот отвечает на команду /info и описывает свой ход работы."""
 
     help_text = """
-    Привет! Я здесь, чтобы следить за тем, кто присоединяется к голосовым каналам на сервере, и сообщать об этом всем пользователям.
+    Привет! Я здесь, чтобы следить за теми, кто присоединяется к голосовым каналам на сервере, и сообщать об этом всем пользователям.
     """
 
     username = ctx.author.name if ctx.author else 'Unknown User'
@@ -69,14 +68,20 @@ async def on_voice_state_update(member, before, after):
     if before.channel is None and after.channel is not None: # Проверяем, что кто-то присоединился.
 
         username = member.display_name if member else "Unknown User"
-        logger.info(f"[{username}] присоединился к чату - {after.channel.name}.")
+        logger.info(f"{username} - присоединился к чату: {after.channel.name}.")
 
-        await send_message_telegram(
-            f"[{username}] присоединился к чату - {after.channel.name}"
-        )
-        await text_channel.send(
-            f"@everyone [{username}] присоединился к чату - {after.channel.name}"
-        )
+        role_to_mention = discord.utils.get(member.guild.roles, name=os.getenv("ROLE_NAME"))
+
+        if role_to_mention:
+            await text_channel.send(
+                f"{role_to_mention.mention} {username} - присоединился к чату: {after.channel.name}"
+            )
+        else:
+            logger.error(f"Роль {role_to_mention} не найдена.")
+
+        # await send_message_telegram(
+        #     f"{username} - присоединился к чату: {after.channel.name}"
+        # ) # Раскоментить эту строчку, если хотим, чтобы бот отправлял сообщение в ТГ.
 
 
 bot.run(os.getenv("DISCORD_TOKEN"))
