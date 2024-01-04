@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "active-user-checker-discord"
 version = "0.1.0"
-description = ""
+description = "Bot that checks how entered to the voice chat."
 authors = ["Mikhail Moskovkin <anstane228@gmail.com>"]
 readme = "README.md"
 

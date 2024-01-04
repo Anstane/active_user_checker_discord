@@ -29,59 +29,59 @@ log_handler.setFormatter(log_formatter)
 logger.addHandler(log_handler)
 
 
-intents = discord.Intents.default() # Дефолтный набор намерений
-intents.message_content = True # Включаем боту чат
-intents.voice_states = True # Включаем боту голосовые чаты
+intents = discord.Intents.default() # Default set of intents
+intents.message_content = True # Enable bot chat
+intents.voice_states = True # Enable bot voice chats
 
-bot = commands.Bot(command_prefix="/", intents=intents) # Создаём бота с параметром намерений
+bot = commands.Bot(command_prefix="/", intents=intents) # Create a bot with an intent parameter
 
 
 @bot.event
 async def on_ready():
-    """Функция кидает print при запусе бота."""
+    """The function throws print when the bot starts."""
 
-    logger.info(f"Бот запущен.")
-    print(f"Бот активирован как: {bot.user}")
+    logger.info(f"The bot is running.")
+    print(f"The bot is activated as: {bot.user}")
 
 
 @bot.command(name="info")
 async def info_command(ctx):
-    """Бот отвечает на команду /info и описывает свой ход работы."""
+    """The bot responds to the /info command and describes its functions."""
 
     help_text = """
-    Привет! Я здесь, чтобы следить за теми, кто присоединяется к голосовым каналам на сервере, и сообщать об этом всем пользователям.
+    Hello! I'm here to monitor who is joining the voice channels on the server and report it to all users.
     """
 
     username = ctx.author.name if ctx.author else 'Unknown User'
-    logger.info(f"{username} запросил /info.")
+    logger.info(f"{username} requested /info.")
 
     await ctx.send(help_text)
 
 
 @bot.event
 async def on_voice_state_update(member, before, after):
-    """Функция, которая отслеживает кто заходит в голосовые чаты и сообщает всем об этом."""
+    """A function that tracks who enters voice chats and notifies everyone about it."""
 
     text_channel_id = os.getenv("TEXT_CHANNEL")
     text_channel = bot.get_channel(int(text_channel_id))
 
-    if before.channel is None and after.channel is not None: # Проверяем, что кто-то присоединился.
+    if before.channel is None and after.channel is not None: # Checking that someone has joined.
 
         username = member.display_name if member else "Unknown User"
-        logger.info(f"{username} - присоединился к чату: {after.channel.name}.")
+        logger.info(f"{username} - joined the chat: {after.channel.name}.")
 
         role_to_mention = discord.utils.get(member.guild.roles, name=os.getenv("ROLE_NAME"))
 
         if role_to_mention:
             await text_channel.send(
-                f"{role_to_mention.mention} {username} - присоединился к чату: {after.channel.name}"
+                f"{role_to_mention.mention} {username} - joined the chat: {after.channel.name}"
             )
         else:
-            logger.error(f"Роль {role_to_mention} не найдена.")
+            logger.error(f"Role {role_to_mention} not found.")
 
         # await send_message_telegram(
-        #     f"{username} - присоединился к чату: {after.channel.name}"
-        # ) # Раскоментить эту строчку, если хотим, чтобы бот отправлял сообщение в ТГ.
+        #     f"{username} - joined the chat: {after.channel.name}"
+        # ) # Uncomment this line if we want the bot to send a message to the Telegram.
 
 
 bot.run(os.getenv("DISCORD_TOKEN"))

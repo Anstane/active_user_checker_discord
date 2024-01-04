@@ -14,9 +14,9 @@ dp = Dispatcher(bot=telegram_bot)
 
 
 async def send_message_telegram(message):
-    """Отправляем сообщение в Телеграм."""
+    """Send a message to Telegram."""
 
     try:
         await telegram_bot.send_message(telegram_chat_id, message)
     except Exception as e:
-        print("Возникла ошибка {e}.")
+        print("An error occurred {e}.")
